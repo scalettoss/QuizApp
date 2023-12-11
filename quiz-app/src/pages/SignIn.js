@@ -78,35 +78,10 @@ function SignIn() {
         className="bg-fix"
       >
         <link
-          rel="shortcut icon"
-          type="image/x-icon"
-          href="/assets/img/favicon.png"
-        />
-        <link
           rel="stylesheet"
           type="text/css"
           href="/assets/css/bootstrap.min.css"
         />
-        <link
-          rel="stylesheet"
-          type="text/css"
-          href="/assets/css/fontawesome-all.min.css"
-        />
-        <link
-          rel="stylesheet"
-          type="text/css"
-          href="/assets/font/flaticon.css"
-        />
-        <link
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap"
-          rel="stylesheet"
-        />
-        <link rel="stylesheet" type="text/css" href="/assets/css/style.css" />
-        <script src="assets/js/jquery.min.js"></script>
-        <script src="assets/js/bootstrap.min.js"></script>
-        <script src="assets/js/imagesloaded.pkgd.min.js"></script>
-        <script src="assets/js/validator.min.js"></script>
-        <script src="assets/js/main.js"></script>
         <div id="wrapper" className="wrapper">
           <div className="fxt-template-layout5">
             <div

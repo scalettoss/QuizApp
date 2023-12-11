@@ -18,33 +18,38 @@ function Quiz() {
   const correctAudio = new Audio(CorrectSound);
   const incorrectAudio = new Audio(IncorrectSound);
   const timeremain = new Audio(TimeRemain);
-
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         let fetchedQuestions = [];
 
-        // Kiểm tra xem dữ liệu đã được lưu trữ trong Local Storage hay chưa
         const storedQuestions = localStorage.getItem("quizQuestions");
         const storedScore = localStorage.getItem("quizScore");
         const storedCurrentQuestionIndex = localStorage.getItem(
           "quizCurrentQuestionIndex"
         );
+        const storedTimeRemaining = localStorage.getItem("quizTimeRemaining");
 
-        if (storedQuestions && storedScore && storedCurrentQuestionIndex) {
+        if (
+          storedQuestions &&
+          storedScore &&
+          storedCurrentQuestionIndex &&
+          storedTimeRemaining
+        ) {
           fetchedQuestions = JSON.parse(storedQuestions);
           setScore(parseInt(storedScore));
           setCurrentQuestionIndex(parseInt(storedCurrentQuestionIndex));
+          setTimeRemaining(parseInt(storedTimeRemaining));
         } else {
           const response = await createAPIEndpoint(ENDPOINTS.question).fetch();
           fetchedQuestions = response.data;
-          // Lưu trữ dữ liệu vào Local Storage
           localStorage.setItem(
             "quizQuestions",
             JSON.stringify(fetchedQuestions)
           );
           localStorage.setItem("quizScore", "0");
           localStorage.setItem("quizCurrentQuestionIndex", "0");
+          localStorage.setItem("quizTimeRemaining", "10");
         }
 
         setQuestions(fetchedQuestions);
@@ -64,6 +69,10 @@ function Quiz() {
       currentQuestionIndex.toString()
     );
   }, [score, currentQuestionIndex]);
+  useEffect(() => {
+    // Lưu trữ giá trị timeRemaining vào Local Storage
+    localStorage.setItem("quizTimeRemaining", timeRemaining.toString());
+  }, [timeRemaining]);
 
   useEffect(() => {
     // Đếm ngược thời gian

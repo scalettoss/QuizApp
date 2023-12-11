@@ -7,7 +7,6 @@ export default function Leader_boadrd() {
     localStorage.removeItem("quizCurrentQuestionIndex");
     localStorage.removeItem("quizScore");
   };
-
   return (
     <div className="quiz-game">
       <div className="header-quiz-game header-board">

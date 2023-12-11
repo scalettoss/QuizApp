@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import {
   CaretLeft,
   HouseSimple,
@@ -11,30 +11,35 @@ import {
   Play,
 } from "@phosphor-icons/react";
 import { Helmet } from "react-helmet";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import { ThreeDots } from "react-loader-spinner";
+import { colors } from "@mui/material";
 
 function Main() {
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleSinglePlayClick = () => {
-    navigate("/quiz");
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      navigate("/quiz");
+    }, 2000);
   };
   const handleLogoutClick = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
+
   return (
     <Fragment>
       <Helmet>
-        <link
-          rel="stylesheet"
-          type="text/css"
-          href="/assets/main_site/css/style.css"
-        />
         <script src="assets/main_site/js/script.js"></script>
       </Helmet>
       <div className="my_container">
@@ -126,36 +131,65 @@ function Main() {
             </div>
           </div>
           <span className="play-text">Play Now</span>
+
           <ArrowFatLinesDown style={{ color: "green", fontSize: "20px" }} />
-          <div className="Avaliable-game">
-            <div className="card">
-              <Card sx={{ maxWidth: 450 }}>
-                <CardMedia
-                  sx={{ height: 160 }}
-                  image="/assets/main_site/images/img_for_quiz_game.png"
-                  title="green iguana"
-                />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    Chủ đề về lĩnh vực công nghệ thông tin
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <div className="game-button">
-                    <button
-                      className="game-button-1"
-                      onClick={handleSinglePlayClick}
-                    >
-                      Single Play <Play style={{ fontSize: "11px" }} />
-                    </button>
-                    <button className="game-button-2">
-                      Host Play <HardDrives style={{ fontSize: "11px" }} />{" "}
-                    </button>
-                  </div>
-                </CardActions>
-              </Card>
+          <div className="card-game-area">
+            <div className="card-game" onClick={handleOpen}>
+              <div className="card-game-img">
+                <img src="/assets/main_site/images/it.png"></img>
+              </div>
+              <div className="card-game-text">
+                <span>10 Question</span>
+                <p>Basic level of Programing Language</p>
+              </div>
             </div>
           </div>
+
+          {/* Modal */}
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box className="modal-box">
+              <Typography>
+                <div className="modal-title">
+                  <img src="/assets/main_site/images/it.png"></img>
+                  <span>10 Question</span>
+                  <p>Basic level of Programing Language</p>
+                </div>
+                <div className="modal-hr"></div>
+                <div className="modal-des">
+                  <p>
+                    Difficulty level: <span>EASY</span>
+                  </p>
+                  <h5>
+                    Kiến thức cơ bản về các ngôn ngữ trong lập trình (python,
+                    java, html, swift,...)Mỗi câu có 10 giây đếm ngược để trả
+                    lời
+                  </h5>
+                </div>
+                <div className="border-hr"></div>
+                <div className="modal-button">
+                  <button onClick={handleSinglePlayClick}>Single Play</button>
+                  <button>Host Play</button>
+                </div>
+                {isLoading && (
+                  <div className="spinner-container">
+                    <ThreeDots
+                      height="80"
+                      width="80"
+                      radius="9"
+                      color="#5b21b6"
+                      ariaLabel="three-dots-loading"
+                      visible={true}
+                    />
+                  </div>
+                )}
+              </Typography>
+            </Box>
+          </Modal>
         </div>
       </div>
     </Fragment>

@@ -366,13 +366,146 @@ body {
 }
 
 
+.card-game
+{
+  width: 269px;
+  height: 232px;
+  background-color: #121125;
+  border-radius: 10px;
+
+}
+
+.card-game-area
+{
+  margin-left: 30px;
+  margin-top: 30px;
+}
+.card-game-text span
+{
+  padding-left: 10px;
+  color: white;
+  font-size: 13px;
+}
+.card-game-text p
+{
+  padding: 5px 0px 0px 10px;
+  color: white;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
 
 
+.card-game-img
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card-game-img img
+{
+  margin-top: 16px;
+  width: 237px;
+  height: 134px;
+  border-radius: 10px;
+}
+.modal-box
+{
+  width: 482px;
+  height: 580px;
+  background-color: white;
+  position: absolute;
+  top: 14%;
+  left: 34%;
+  background-color: #1e1f38;
 
+}
 
+.modal-title img
+{
+  height: 262px;
+  width: 100%;
+}
 
+.modal-title span
+{
+  padding: 10px;
+  font-size: 14px;
+  color: rgb(241, 233, 233);
+  font-weight: 500;
+}
+.modal-title p
+{
+  padding: 10px;
+  font-size: 32px;
+  color: white;
+  line-height: 36px;
+  font-weight: bold;
+}
+.border-hr
+{
+  border-bottom: 2px solid #6b7280;
 
+}
+.modal-des
+{
+  margin-top: 10px;
+  padding-left: 10px;
+}
+.modal-des p
+{
+  font-weight: 700;
+  color: white;
+  font-size: 15px;
+}
+.modal-des span
+{
+  color: rgb(45, 236, 45);
+}
 
+.modal-des h5
+{
+  color: white;
+  font-size: 14px;
+}
+
+.modal-button
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  gap: 5px;
+
+}
+.modal-button button
+{
+  width: 48%;
+  height: 50px;
+  border-radius: 10px;
+  border: none;
+  background-color: #1261df;
+  color: white;
+  font-weight: 500;
+}
+.modal-button button:last-child
+{
+  background-color: rgb(177, 34, 216);
+}
+
+.spinner-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
 
 
 
