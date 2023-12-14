@@ -8,7 +8,7 @@ import SignUp from "./pages/SignUp";
 import Main from "./pages/Main";
 import Quiz from "./pages/Quiz";
 import Leader_boadrd from "./pages/Leader-board";
-import Dots from "./pages/toast";
+import QuizPage from "./pages/toast";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
@@ -19,7 +19,7 @@ root.render(
       <Route path="/" element={<Main />} />
       <Route path="/quiz" element={<Quiz />} />
       <Route path="/board" element={<Leader_boadrd />} />
-      <Route path="/test" element={<Dots />} />
+      <Route path="/test" element={<QuizPage />} />
     </Routes>
   </BrowserRouter>
   // </React.StrictMode>

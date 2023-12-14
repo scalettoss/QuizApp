@@ -6,8 +6,10 @@ import CorrectSound from "../mp3/correct.mp3";
 import IncorrectSound from "../mp3/incorrect.mp3";
 import TimeRemain from "../mp3/timeremains.mp3";
 import { Alarm } from "@phosphor-icons/react";
+import { useNavigate } from "react-router-dom";
 
 function Quiz() {
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -15,6 +17,7 @@ function Quiz() {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(9);
+  const [tempScore, setTempScore] = useState(0);
   const correctAudio = new Audio(CorrectSound);
   const incorrectAudio = new Audio(IncorrectSound);
   const timeremain = new Audio(TimeRemain);
@@ -22,7 +25,6 @@ function Quiz() {
     const fetchQuestions = async () => {
       try {
         let fetchedQuestions = [];
-
         const storedQuestions = localStorage.getItem("quizQuestions");
         const storedScore = localStorage.getItem("quizScore");
         const storedCurrentQuestionIndex = localStorage.getItem(
@@ -43,10 +45,14 @@ function Quiz() {
         } else {
           const response = await createAPIEndpoint(ENDPOINTS.question).fetch();
           fetchedQuestions = response.data;
+          fetchedQuestions.forEach((question) => {
+            question.options = shuffleOptions(question.options);
+          });
           localStorage.setItem(
             "quizQuestions",
             JSON.stringify(fetchedQuestions)
           );
+
           localStorage.setItem("quizScore", "0");
           localStorage.setItem("quizCurrentQuestionIndex", "0");
           localStorage.setItem("quizTimeRemaining", "10");
@@ -79,11 +85,9 @@ function Quiz() {
     const timer = setInterval(() => {
       setTimeRemaining((prevTime) => prevTime - 1);
     }, 1000);
-
-    if (timeRemaining === 5) {
+    if (timeRemaining === 4) {
       timeremain.play();
     }
-    // Kiểm tra nếu hết thời gian
     if (timeRemaining === 0) {
       handleOptionClick(""); // Xử lý không chọn đáp án khi hết thời gian
     }
@@ -94,18 +98,54 @@ function Quiz() {
     // Reset timeRemaining to 10 when currentQuestionIndex changes
     setTimeRemaining(10);
   }, [currentQuestionIndex]);
+
   const handleOptionClick = (selectedAnswer) => {
     const currentQuestion = questions[currentQuestionIndex];
     let updatedScore = score;
 
     if (selectedAnswer === currentQuestion.answer) {
-      updatedScore = score + 1;
+      if (timeRemaining >= 8) {
+        updatedScore = score + 100;
+        setTempScore(updatedScore);
+      } else {
+        const timeElapsed = 8 - timeRemaining;
+        updatedScore = score + (100 - timeElapsed * 10);
+        setTempScore(updatedScore);
+      }
+
       setIsCorrect(true);
-      correctAudio.play(); // Phát âm thanh khi đáp án đúng được chọn
+      correctAudio.play();
     } else {
+      const storedIndexes = localStorage.getItem(
+        "quizIncorrectQuestionIndexes"
+      );
+      const incorrectQuestionIndexes = storedIndexes
+        ? JSON.parse(storedIndexes)
+        : [];
+
+      // Thêm vị trí và đáp án sai vào mảng incorrectQuestionIndexes
+      incorrectQuestionIndexes.push({
+        index: currentQuestionIndex,
+        answer: selectedAnswer,
+      });
+
+      localStorage.setItem(
+        "quizIncorrectQuestionIndexes",
+        JSON.stringify(incorrectQuestionIndexes)
+      );
+
       setIsCorrect(false);
       incorrectAudio.play();
     }
+
+    // if (timeRemaining >= 8) {
+    //   updatedScore = score + 100;
+    //   setTempScore(100);
+    // } else if (timeRemaining < 8) {
+    //   const timeElapsed = 8 - timeRemaining;
+    //   updatedScore = score + (100 - timeElapsed * 10);
+    //   setTempScore(100 - timeElapsed * 10);
+    // }
 
     setScore(updatedScore);
     setSelectedAnswer(selectedAnswer);
@@ -117,14 +157,37 @@ function Quiz() {
         setSelectedAnswer("");
         setShowResult(false);
         setIsCorrect(false);
+      } else {
+        navigate("/board");
       }
     }, 1000);
   };
 
+  const shuffleOptions = (options) => {
+    const shuffledOptions = [...options];
+    for (let i = shuffledOptions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledOptions[i], shuffledOptions[j]] = [
+        shuffledOptions[j],
+        shuffledOptions[i],
+      ];
+    }
+    return shuffledOptions;
+  };
+
   const handleLeaveClick = () => {
-    localStorage.removeItem("quizQuestions");
-    localStorage.removeItem("quizCurrentQuestionIndex");
-    localStorage.removeItem("quizScore");
+    const token = localStorage.getItem("token"); // Giữ lại mục "token"
+
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key !== "token") {
+        localStorage.removeItem(key);
+      }
+    }
+
+    if (token) {
+      localStorage.setItem("token", token); // Đặt lại mục "token" nếu cần thiết
+    }
   };
 
   if (questions.length === 0) {
@@ -132,15 +195,7 @@ function Quiz() {
   }
 
   const currentQuestion = questions[currentQuestionIndex];
-  function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  }
-  const shuffledOptions = shuffleArray(currentQuestion.options);
+
   const currentOptions = currentQuestion.options;
   return (
     <div className="quiz-game">
@@ -193,7 +248,11 @@ function Quiz() {
                 isCorrect ? "correct" : "incorrect"
               }`}
             >
-              <span>{isCorrect ? "CORRECT" : "INCORRECT"}</span>
+              <span>
+                {isCorrect
+                  ? "+" + tempScore.toString() + " Point"
+                  : "INCORRECT"}
+              </span>
             </div>
           )}
         </div>
@@ -201,5 +260,4 @@ function Quiz() {
     </div>
   );
 }
-
 export default Quiz;
