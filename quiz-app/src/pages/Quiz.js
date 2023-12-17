@@ -85,9 +85,9 @@ function Quiz() {
     const timer = setInterval(() => {
       setTimeRemaining((prevTime) => prevTime - 1);
     }, 1000);
-    if (timeRemaining === 4) {
-      timeremain.play();
-    }
+    // if (timeRemaining === 4) {
+    //   // timeremain.play();
+    // }
     if (timeRemaining === 0) {
       handleOptionClick(""); // Xử lý không chọn đáp án khi hết thời gian
     }
@@ -106,11 +106,11 @@ function Quiz() {
     if (selectedAnswer === currentQuestion.answer) {
       if (timeRemaining >= 8) {
         updatedScore = score + 100;
-        setTempScore(updatedScore);
+        setTempScore(100);
       } else {
         const timeElapsed = 8 - timeRemaining;
         updatedScore = score + (100 - timeElapsed * 10);
-        setTempScore(updatedScore);
+        setTempScore(100 - timeElapsed * 10);
       }
 
       setIsCorrect(true);

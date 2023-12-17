@@ -1,7 +1,5 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowElbowDownRight, CaretCircleRight } from "@phosphor-icons/react";
-import { borderBottom } from "@mui/system";
 
 export default function Leader_boadrd() {
   const handleLeaveClick = () => {
