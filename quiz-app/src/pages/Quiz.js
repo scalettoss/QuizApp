@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import createAPIEndpoint from "../API/api";
 import { ENDPOINTS } from "../API/api";
 import { Link } from "react-router-dom";
@@ -138,15 +144,6 @@ function Quiz() {
       incorrectAudio.play();
     }
 
-    // if (timeRemaining >= 8) {
-    //   updatedScore = score + 100;
-    //   setTempScore(100);
-    // } else if (timeRemaining < 8) {
-    //   const timeElapsed = 8 - timeRemaining;
-    //   updatedScore = score + (100 - timeElapsed * 10);
-    //   setTempScore(100 - timeElapsed * 10);
-    // }
-
     setScore(updatedScore);
     setSelectedAnswer(selectedAnswer);
     setShowResult(true);
@@ -180,7 +177,7 @@ function Quiz() {
 
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
-      if (key !== "token") {
+      if (key !== "token" && key !== "user") {
         localStorage.removeItem(key);
       }
     }

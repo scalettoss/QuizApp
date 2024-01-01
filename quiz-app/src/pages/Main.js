@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import {
   CaretLeft,
   HouseSimple,
@@ -7,24 +7,64 @@ import {
   Info,
   SignOut,
   ArrowFatLinesDown,
-  HardDrives,
-  Play,
+  FilePlus,
+  CirclesThreePlus,
 } from "@phosphor-icons/react";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { ThreeDots } from "react-loader-spinner";
-import { colors } from "@mui/material";
+import createAPIEndpoint from "../API/api";
+import { ENDPOINTS } from "../API/api";
+import FilePresentIcon from "@mui/icons-material/FilePresent";
+import EditIcon from "@mui/icons-material/Edit";
+import { CreateQuizModal } from "./CreateQuizModal";
 
 function Main() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchUserInfo(token);
+    }
+  }, []);
+
+  const fetchUserInfo = (token) => {
+    const api = createAPIEndpoint(ENDPOINTS.user);
+    api
+      .userinfo(token)
+      .then((response) => {
+        setUser(response.data);
+        const encodedUser = btoa(JSON.stringify(response.data));
+        localStorage.setItem("user", encodedUser);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   const navigate = useNavigate();
+
+  const [cardGameModalOpen, setCardGameModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleCardGameModalOpen = () => {
+    setCardGameModalOpen(true);
+  };
+  const handleCardGameModalClose = () => {
+    setCardGameModalOpen(false);
+  };
+
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  const handleOpenCreateModal = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setCreateModalOpen(false);
+  };
+
   const handleSinglePlayClick = () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -32,8 +72,12 @@ function Main() {
       navigate("/quiz");
     }, 2000);
   };
+
   const handleLogoutClick = () => {
-    localStorage.removeItem("token");
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      localStorage.removeItem(key);
+    }
     navigate("/login");
   };
 
@@ -61,6 +105,12 @@ function Main() {
               <div className="menu">
                 <p className="title">Main</p>
                 <ul>
+                  <li>
+                    <a href="#" onClick={handleOpenCreateModal}>
+                      <CirclesThreePlus size={20} />
+                      <span className="text">Create A Quiz</span>
+                    </a>
+                  </li>
                   <li className="active">
                     <a href="/#">
                       <HouseSimple size={20} />
@@ -68,12 +118,16 @@ function Main() {
                     </a>
                   </li>
                   <li>
-                    <a href="/#">
+                    <a href="/list">
                       <ListDashes size={20} />
                       <span className="text">List</span>
                     </a>
                   </li>
                 </ul>
+                <CreateQuizModal
+                  open={createModalOpen}
+                  handleClose={handleCloseCreateModal}
+                />
               </div>
               <div className="menu">
                 <p className="title">Settings</p>
@@ -112,10 +166,10 @@ function Main() {
               <img
                 src="/assets/main_site/images/snapedit_1701926027907.png"
                 id="user-img"
-                alt=""
+                alt="Error"
               />
               <div className="dropdown-menu" id="menu">
-                <a href="/#">Name</a>
+                <a href="/#">{user ? user.fullname : "Chưa Đăng Nhập"}</a>
                 <a href="/#">Cài đặt</a>
                 <a href="/#">Đăng xuất</a>
               </div>
@@ -134,9 +188,9 @@ function Main() {
 
           <ArrowFatLinesDown style={{ color: "green", fontSize: "20px" }} />
           <div className="card-game-area">
-            <div className="card-game" onClick={handleOpen}>
+            <div className="card-game" onClick={handleCardGameModalOpen}>
               <div className="card-game-img">
-                <img src="/assets/main_site/images/it.png"></img>
+                <img src="/assets/main_site/images/it.png" alt="Error"></img>
               </div>
               <div className="card-game-text">
                 <span>10 Question</span>
@@ -147,15 +201,15 @@ function Main() {
 
           {/* Modal */}
           <Modal
-            open={open}
-            onClose={handleClose}
+            open={cardGameModalOpen}
+            onClose={handleCardGameModalClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
             <Box className="modal-box">
               <Typography>
                 <div className="modal-title">
-                  <img src="/assets/main_site/images/it.png"></img>
+                  <img src="/assets/main_site/images/it.png" alt="Error"></img>
                   <span>10 Question</span>
                   <p>Basic level of Programing Language</p>
                 </div>

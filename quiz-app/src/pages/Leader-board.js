@@ -1,20 +1,24 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import createAPIEndpoint from "../API/api";
+import { ENDPOINTS } from "../API/api";
 
 export default function Leader_boadrd() {
   const handleLeaveClick = () => {
-    const token = localStorage.getItem("token"); // Giữ lại mục "token"
+    const token = localStorage.getItem("token");
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
-      if (key !== "token") {
+      if (key !== "token" && key !== "user") {
         localStorage.removeItem(key);
       }
     }
-
     if (token) {
       localStorage.setItem("token", token); // Đặt lại mục "token" nếu cần thiết
     }
   };
+  const encodedUser = localStorage.getItem("user");
+  const decodedUser = encodedUser ? JSON.parse(atob(encodedUser)) : null;
+
   const storedQuestions = JSON.parse(localStorage.getItem("quizQuestions"));
   const quizInCorrectQuestionIndexes = JSON.parse(
     localStorage.getItem("quizIncorrectQuestionIndexes")
@@ -42,7 +46,7 @@ export default function Leader_boadrd() {
             src="/assets/main_site/images/snapedit_1701926027907.png"
             alt=""
           />
-          <h3>Full Name</h3>
+          <h3>{decodedUser.fullname}</h3>
           <span>{Score} Point</span>
           <div className="total-area">
             <div

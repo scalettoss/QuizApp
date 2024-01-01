@@ -6,6 +6,7 @@ export const ENDPOINTS = {
   participant: "participant",
   question: "question",
   user: "user",
+  map: "map",
 };
 
 const createAPIEndpoint = (endpoint) => {
@@ -20,7 +21,9 @@ const createAPIEndpoint = (endpoint) => {
     register: (user) => axios.post(url + "register", user),
     getquestion: (number) =>
       axios.get(url + "getquestion", { params: { number } }),
-    userinfo: (token) => axios.post(url + "userinfo", token),
+    userinfo: (token) => axios.post(url + "userinfo", { token: token }),
+    createBy: (createdBy) =>
+      axios.get(url + "createdby", { params: { createdBy } }),
   };
 };
 

@@ -9,6 +9,10 @@ import Main from "./pages/Main";
 import Quiz from "./pages/Quiz";
 import Leader_boadrd from "./pages/Leader-board";
 import QuizPage from "./pages/toast";
+import List from "./pages/List";
+import CreateQuizModal from "./pages/CreateQuizModal";
+import Complete from "./pages/CompleteQuiz";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
@@ -20,6 +24,9 @@ root.render(
       <Route path="/quiz" element={<Quiz />} />
       <Route path="/board" element={<Leader_boadrd />} />
       <Route path="/test" element={<QuizPage />} />
+      <Route path="/list" element={<List />} />
+      <Route path="/create" element={<CreateQuizModal />} />
+      <Route path="/complete" element={<Complete />} />
     </Routes>
   </BrowserRouter>
   // </React.StrictMode>
