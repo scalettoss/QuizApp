@@ -24,21 +24,57 @@ namespace QuizAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Participant>>> GetParticipants()
         {
-            if (_context.Participants == null)
+          if (_context.Participants == null)
+          {
+              return NotFound();
+          }
+            return await _context.Participants.ToListAsync();
+        }
+        //[HttpGet("getparbymapid/{mapId}")]
+        //public async Task<ActionResult<IEnumerable<Participant>>> GetParticipantsByMapId(int mapId)
+        //{
+        //    var participants = await _context.Participants
+        //        .Where(p => p.MapId == mapId)
+        //        .OrderByDescending(p => p.Score)
+        //        .Take(3)
+        //        .Select(p => new { p.Times, p.Score, p.UserId })
+        //        .ToListAsync();
+
+        //    if (participants == null || participants.Count == 0)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return Ok(participants);
+        //}
+
+        [HttpGet("getparbymapid/{mapId}")]
+        public async Task<ActionResult<IEnumerable<dynamic>>> GetParticipantsByMapId(int mapId)
+        {
+            var participants = await _context.Participants
+                .Where(p => p.MapId == mapId)
+                .OrderByDescending(p => p.Score)
+                .Take(3)
+                .Join(_context.Users, p => p.UserId, u => u.Id, (p, u) => new { p.Times, p.Score, u.Fullname })
+                .ToListAsync();
+
+            if (participants == null || participants.Count == 0)
             {
                 return NotFound();
             }
-            return await _context.Participants.ToListAsync();
+            return Ok(participants);
         }
+
+
 
         // GET: api/Participant/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Participant>> GetParticipant(int id)
         {
-            if (_context.Participants == null)
-            {
-                return NotFound();
-            }
+          if (_context.Participants == null)
+          {
+              return NotFound();
+          }
             var participant = await _context.Participants.FindAsync(id);
 
             if (participant == null)
@@ -48,7 +84,18 @@ namespace QuizAPI.Controllers
 
             return participant;
         }
+        [HttpGet("{mapId}/{userId}")]
+        public async Task<ActionResult<Participant>> GetParticipant(int mapId, int userId)
+        {
+            var participant = await _context.Participants.FirstOrDefaultAsync(p => p.MapId == mapId && p.UserId == userId);
 
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            return participant;
+        }
         // PUT: api/Participant/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -85,15 +132,17 @@ namespace QuizAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Participant>> PostParticipant(Participant participant)
         {
-            var temp = _context.Participants.Where(x => x.Email == participant.Email).FirstOrDefault();
-            if (temp == null)
+            if (_context.Participants == null)
             {
-                _context.Participants.Add(participant);
-                await _context.SaveChangesAsync();
+                return Problem("Entity set 'QuizDbContext.Participants'  is null.");
             }
-            else participant = temp;
-            return Ok(participant);
+            _context.Participants.Add(participant);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetParticipant", new { id = participant.Id }, participant);
         }
+
+
         // DELETE: api/Participant/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteParticipant(int id)
@@ -103,6 +152,22 @@ namespace QuizAPI.Controllers
                 return NotFound();
             }
             var participant = await _context.Participants.FindAsync(id);
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            _context.Participants.Remove(participant);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("{mapId}/{userId}")]
+        public async Task<IActionResult> DeleteParticipantByMapIdAndUserId(int mapId, int userId)
+        {
+            var participant = await _context.Participants
+                .FirstOrDefaultAsync(p => p.MapId == mapId && p.UserId == userId);
+
             if (participant == null)
             {
                 return NotFound();

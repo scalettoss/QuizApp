@@ -5,14 +5,27 @@ import Modal from "@mui/material/Modal";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { PencilSimple, FileArrowUp } from "@phosphor-icons/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Fragment } from "react";
 import { Image } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useEffect } from "react";
+import createAPIEndpoint, { ENDPOINTS } from "../API/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  height: 220,
+  bgcolor: "#1e1f38",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 const toast_error = () => {
   toast.error("Không được để trống", {
     position: "bottom-right",
@@ -38,86 +51,20 @@ const toast_success = () => {
   });
 };
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  height: 220,
-  bgcolor: "#1e1f38",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
-function CreateQuizModal({ open, handleClose }) {
-  const navigate = useNavigate();
-  const redirectToCreatePage = () => {
-    navigate("/create");
-  };
-  return (
-    <div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              color: "gray",
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography>
-            <div className="create-modal-area">
-              <p>Create A Quiz</p>
-              <button onClick={redirectToCreatePage}>
-                Create Manual <PencilSimple size={15} />
-              </button>
-              <button>
-                Import Json <FileArrowUp size={15} />
-              </button>
-            </div>
-          </Typography>
-        </Box>
-      </Modal>
-    </div>
-  );
-}
-export { CreateQuizModal };
-
-export default function CreateQuiz() {
+export default function () {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [questions, setQuestions] = useState([]);
 
-  useEffect(() => {
-    const savedQuestions = localStorage.getItem("questions");
-    if (savedQuestions) {
-      setQuestions(JSON.parse(savedQuestions));
-    }
-  }, []);
-  useEffect(() => {
-    // Update localStorage when questions change
-    localStorage.setItem("questions", JSON.stringify(questions));
-  }, [questions]);
-
+  const { id } = useParams();
   const handleRadioChange = (index) => {
     setSelectedAnswer(index);
   };
   const encodedUser = localStorage.getItem("user");
   const decodedUser = encodedUser ? JSON.parse(atob(encodedUser)) : null;
+
   const handleCreateQuestion = () => {
     if (
       title.trim() === "" ||
@@ -128,27 +75,37 @@ export default function CreateQuiz() {
       return;
     }
     const newQuestion = {
-      index: questions.length + 1,
       title: title,
-      options: options,
+      OP1: options[0],
+      OP2: options[1],
+      OP3: options[2],
+      OP4: options[3],
       answer: options[selectedAnswer],
       Img: "",
       CreateBy: decodedUser.id,
       CreateAt: new Date().toISOString(),
-      MapId: null,
+      MapId: id,
     };
-
-    setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
-    setTitle("");
-    setOptions(["", "", "", ""]);
-    setSelectedAnswer("");
-    toast_success();
+    const AddQuestAPI = createAPIEndpoint(ENDPOINTS.question);
+    AddQuestAPI.post(newQuestion)
+      .then((res) => {
+        console.log("post question by mapid complete", res.data);
+        toast_success();
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((error) => {
+        console.log(error);
+        toast_error();
+      });
   };
-  const handelComplete = () => {
-    navigate("/complete");
+
+  const handelComplete = (id) => {
+    navigate(`/edit/${id}`);
   };
   const handleBackClick = () => {
-    navigate("/");
+    navigate("/list");
   };
   return (
     <Fragment>
@@ -156,7 +113,7 @@ export default function CreateQuiz() {
         <div className="create-header">
           <a onClick={handleBackClick}>Back</a>
           <span>{questions.length + 1}</span>
-          <button onClick={handelComplete}>Complete</button>
+          <button onClick={() => handelComplete(id)}>Next Step</button>
         </div>
         <div className="create-content">
           <div className="create-content-center">

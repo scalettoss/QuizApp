@@ -8,16 +8,39 @@ import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Plus } from "@phosphor-icons/react";
-export default function Complete() {
-  const { eid } = useParams();
+import { error } from "jquery";
+import { useEffect } from "react";
+
+export default function EditQuiz() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const encodedUser = localStorage.getItem("user");
   const decodedUser = encodedUser ? JSON.parse(atob(encodedUser)) : null;
   const [selectedDifficulty, setSelectedDifficulty] = useState("0");
-  const [questions, setQuestions] = useState(() => {
-    const storedQuestions = JSON.parse(localStorage.getItem("questions"));
-    return storedQuestions ? storedQuestions : [];
-  });
+  const [questions, setQuestions] = useState([]);
+  const [tempTitle, setTempTitle] = useState("");
+  const [tempTopic, setTempTopic] = useState("");
+  const [tempDes, setTempDes] = useState("Type description here");
+
+  //fetch lay cac cau hoi tu map theo id user
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await createAPIEndpoint(ENDPOINTS.question).getbymap(
+          id
+        );
+        const modifiedQuestions = response.data.map((question) => ({
+          ...question,
+          options: [question.oP1, question.oP2, question.oP3, question.oP4],
+        }));
+        setQuestions(modifiedQuestions);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchQuestions();
+  }, []);
+
   const toast_error = () => {
     toast.error("Không được để trống", {
       position: "bottom-right",
@@ -43,6 +66,7 @@ export default function Complete() {
     });
   };
   const [quizData, setQuizData] = useState({
+    id: id,
     title: "",
     topic: "",
     difficulty: "",
@@ -52,6 +76,53 @@ export default function Complete() {
     status: 1,
   });
 
+  const QuizTemp = () => {
+    const MapTempAPI = createAPIEndpoint(ENDPOINTS.map);
+    MapTempAPI.fetchById(id)
+      .then((response) => {
+        const data = response.data;
+        const tempTitle = data.title;
+        const tempTopic = data.topic;
+        const tempDes = data.description;
+        setTempTitle(tempTitle);
+        setTempTopic(tempTopic);
+        setTempDes(tempDes);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  QuizTemp();
+
+  //submit edit
+  const handlePublish = (id) => {
+    const EditmapAPI = createAPIEndpoint(ENDPOINTS.map);
+    EditmapAPI.put(id, quizData)
+      .then((response) => {
+        console.log("put complete");
+        toast_success();
+        navigate("/list");
+      })
+      .catch((error) => {
+        console.log("put error");
+        toast_error();
+      });
+  };
+
+  //delete question
+  const handleDeleteQuestion = (index) => {
+    const delQuestAPI = createAPIEndpoint(ENDPOINTS.question);
+    delQuestAPI
+      .delete(index)
+      .then((response) => {
+        console.log("delete complete");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleStatusChange = (event) => {
     const { checked } = event.target;
     const newStatus = checked ? 2 : 1;
@@ -60,77 +131,9 @@ export default function Complete() {
       status: newStatus,
     }));
   };
+
   const handleDifficultyChange = (e) => {
     setSelectedDifficulty(e.target.value);
-  };
-  const handleDeleteQuestion = (index) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions.splice(index, 1);
-    setQuestions(updatedQuestions);
-    localStorage.setItem("questions", JSON.stringify(updatedQuestions));
-  };
-  const handlePublish = () => {
-    const storedQuestions = JSON.parse(localStorage.getItem("questions"));
-    // Gửi quizData đến ENDPOINT.map để lấy mapid
-    const api = createAPIEndpoint(ENDPOINTS.map);
-    api
-      .post(quizData)
-      .then((response) => {
-        const mapid = response.data.id;
-        console.log("Quiz Data posted successfully:", response.data);
-        const questApi = createAPIEndpoint(ENDPOINTS.question);
-        // Gửi từng đối tượng question một cách tuần tự
-        const sendQuestion = (index, mapid) => {
-          if (index >= storedQuestions.length) {
-            console.log("All questions posted successfully");
-            return;
-          }
-          const question = storedQuestions[index];
-          const questData = {
-            img: "/assets/img/quiz.png",
-            title: question.title,
-            oP1: question.options[0],
-            oP2: question.options[1],
-            oP3: question.options[2],
-            oP4: question.options[3],
-            answer: question.answer,
-            createAt: new Date().toISOString(),
-            createBy: decodedUser.id,
-            MapId: mapid,
-          };
-          questApi
-            .post(questData)
-            .then((response) => {
-              console.log("Question Data posted successfully:", response.data);
-              sendQuestion(index + 1, mapid); // Gửi đối tượng question tiếp theo với cùng mapid
-            })
-            .catch((error) => {
-              console.error("Error posting question data:", error);
-              console.log(questData);
-            });
-        };
-        sendQuestion(0, mapid);
-        toast_success();
-        localStorage.removeItem("questions");
-        navigate("/list");
-      })
-      .catch((error) => {
-        console.error("Error posting data:", error);
-        toast_error();
-      });
-  };
-
-  const handleLeaveClick = () => {
-    const token = localStorage.getItem("token");
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key !== "token" && key !== "user") {
-        localStorage.removeItem(key);
-      }
-    }
-    if (token) {
-      localStorage.setItem("token", token); // Đặt lại mục "token" nếu cần thiết
-    }
   };
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -140,14 +143,21 @@ export default function Complete() {
       difficulty: selectedDifficulty,
     }));
   };
-  const handleCreateQuiz = () => {
-    navigate("/create");
+  const handleEditCreate = (id) => {
+    navigate(`/editcreate/${id}`);
   };
+  const handleExit = () => {
+    navigate("/list");
+  };
+
   return (
     <div className="complete-container">
       <div className="complete-header">
         <span>BAOQUIZ</span>
-        <button onClick={handlePublish}>Publish</button>
+        <div>
+          <button onClick={handleExit}>Exit</button>
+          <button onClick={() => handlePublish(id)}>Save</button>
+        </div>
       </div>
       <div className="complete-content">
         <div className="comp-title">
@@ -160,13 +170,21 @@ export default function Complete() {
               <label htmlFor="title">
                 Name of Quiz <span>*</span>
               </label>
-              <input id="title" onChange={handleChange}></input>
+              <input
+                id="title"
+                onChange={handleChange}
+                placeholder={tempTitle}
+              ></input>
             </div>
             <div className="form-complete">
               <label htmlFor="topic">
                 Topic <span>*</span>
               </label>
-              <input id="topic" onChange={handleChange}></input>
+              <input
+                id="topic"
+                onChange={handleChange}
+                placeholder={tempTopic}
+              ></input>
             </div>
             <div className="form-complete">
               <label htmlFor="diff">
@@ -204,7 +222,7 @@ export default function Complete() {
                 </label>
                 <input
                   id="description"
-                  placeholder="Type description here"
+                  placeholder={tempDes}
                   onChange={handleChange}
                 ></input>
               </div>
@@ -212,7 +230,7 @@ export default function Complete() {
           </form>
           <div className="question-overview-title">
             <p>Question OverView</p>
-            <div className="plus-icon" onClick={handleCreateQuiz}>
+            <div className="plus-icon" onClick={() => handleEditCreate(id)}>
               <Plus size={25} />
             </div>
           </div>
@@ -233,7 +251,7 @@ export default function Complete() {
                       {option}
                     </span>
                   ))}
-                  <span onClick={() => handleDeleteQuestion(index)}>
+                  <span onClick={() => handleDeleteQuestion(question.id)}>
                     <Trash size={20} />
                   </span>
                 </div>

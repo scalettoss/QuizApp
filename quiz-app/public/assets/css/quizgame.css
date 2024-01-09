@@ -42,7 +42,7 @@
 .quiz-game
 {
     background-color: #1e1f38;
-    height: 100vh;
+    height: auto;
 }
 .content-quiz-game
 {
@@ -185,7 +185,7 @@
   {
     background-color: #121125;
     margin: 20px;
-    height: 630px;
+    height: 650px;
     border-radius: 10px;
     display: flex;
   }
@@ -355,10 +355,6 @@
   top: 10%;
   background-color: #1e1f38;
 
-}
-.list-content-show
-{
-  margin-top: 100px;
 }
 .list-button
 {
@@ -726,7 +722,7 @@ input[type="file"] {
 .complete-container
 {
   background-color: #1e1f38;
-  height: 100vh;
+  height: auto;
 }
 .complete-header
 {
@@ -854,7 +850,8 @@ label#changes-lable {
 }
 .quiz-des label
 {
-  margin-right: 370px;
+  padding: 10px 0px 10px 0px;
+  margin-right: 410px;
   color: white;
   font-weight: 500;
 }
@@ -866,6 +863,7 @@ label#changes-lable {
   border: none;
   border-radius: 5px;
   padding-left: 10px;
+  color: white;
 
 }
 p#p-hr {
@@ -878,13 +876,19 @@ p#p-hr {
   display: flex;
   justify-content: space-between;
   border-radius: 5px;
+  margin-top: 10px;
 }
 
+.overview span
+{
+  padding-top: 6px;
+}
 .overview span:first-child
 {
   padding-left: 15px;
   padding-top: 6px;
   color: white;
+  width: 500px;
 
 }
 .overview span:last-child
@@ -892,4 +896,131 @@ p#p-hr {
   padding-right: 15px;
   color: red;
   padding-top: 8px;
+}
+.card-game-new {
+  position: relative;
+}
+
+.card-game-new .game-icon {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  display: none;
+}
+
+.card-game-new:hover .game-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-game-new:hover .game-icon .edit-icon,
+.card-game-new:hover .game-icon .trash-icon {
+  display: block;
+  background-color: #121125;
+  border-radius: 5px;
+  padding: 8px 15px 8px 15px;
+  margin: 5px;
+}
+
+.card-game-new:hover .game-icon .edit-icon:hover,
+.card-game-new:hover .game-icon .trash-icon:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.card-game-new:hover .game-icon svg {
+  color: white;
+}
+.question-overview-title
+{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.question-overview-title
+{
+  margin-top: 10px;
+  border-bottom: 1px solid white;
+}
+.plus-icon
+{
+  background-color: #5b21b6;
+  border-radius: 50%;
+  color: white;
+  padding: 5px 10px 0px 10px;
+}
+body
+{
+  background-color: #1e1f38;
+}
+
+.no-question p
+{
+  color: white;
+  font-size: 30px;
+  font-weight: 600;
+}
+.radio-status
+{
+  margin-top: 10px;
+  display: flex;
+  font-size: 18px;
+  font-weight: 200;
+  gap: 10px;
+}
+span.new-scores {
+  font-size: 20px;
+  color: rgb(64, 64, 236);
+  transform: rotate(30deg);
+}
+.rank-player
+{
+  background-color: #121125;
+  margin: 0px 20px 0px 20px;
+}
+.show-rank-area
+{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  height: auto;
+  padding-bottom: 50px;
+}
+.show-rank-area P 
+{
+  color: white;
+  font-size: 30px;
+  font-weight: 600;
+  padding-top: 20px;
+}
+.rank-area
+{
+  height: 60px;
+  display: flex;
+  background-color: #1e1f38;
+  width: 30%;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+}
+.rank-area span
+{
+  padding-left: 10px;
+  width: 30%;
+}
+
+.rank-area span:nth-child(1)
+{
+  color: rgb(14, 63, 243);
+  font-weight: bold;
+}
+.rank-area span:nth-child(2)
+{
+  color: red;
+}
+.rank-area span:nth-child(3)
+{
+  color: rgb(48, 203, 208);
 }

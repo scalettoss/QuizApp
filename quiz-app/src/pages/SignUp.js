@@ -65,7 +65,7 @@ function SignUp() {
         console.log("Registration successful:", response.data);
         toast_success();
         setTimeout(() => {
-          navigate("/login");
+          navigate("/");
         }, 2000);
       })
       .catch((error) => {
@@ -106,12 +106,12 @@ function SignUp() {
             </div>
             <div className="fxt-bg-color">
               <div className="fxt-header">
-                <Link to="/login" className="fxt-logo">
+                <Link to="/" className="fxt-logo">
                   <p>BAOQUIZ</p>
                 </Link>
                 <div className="fxt-page-switcher">
                   <Link
-                    to="/login"
+                    to="/"
                     className="switcher-text switcher-text1 text-decoration-none"
                   >
                     Login

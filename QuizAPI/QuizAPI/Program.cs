@@ -12,7 +12,6 @@ builder.Services.AddDbContext<QuizDbContext>(options => options.UseSqlServer(bui
 
 
 var app = builder.Build();
-//app.UseCors(options => options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
 app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 

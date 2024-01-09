@@ -12,6 +12,7 @@ export const ENDPOINTS = {
 const createAPIEndpoint = (endpoint) => {
   let url = BASE_URL + "api/" + endpoint + "/";
   return {
+    update: (id) => axios.put(url + id),
     fetch: () => axios.get(url),
     fetchById: (id) => axios.get(url + id),
     post: (newRecord) => axios.post(url, newRecord),
@@ -24,6 +25,13 @@ const createAPIEndpoint = (endpoint) => {
     userinfo: (token) => axios.post(url + "userinfo", { token: token }),
     createBy: (createdBy) =>
       axios.get(url + "createdby", { params: { createdBy } }),
+    getParticipant: (mapId, userId) => axios.get(url + mapId + "/" + userId),
+    getbymap: (mapId) => axios.get(url + "getbymap/" + mapId),
+    getAvailableMap: () => axios.get(url + "availablemap"),
+    getParbyMapId: (mapId) => axios.get(url + "getparbymapid/" + mapId),
+    deleteQuestByMapId: (id) => axios.delete(url + "deleteby-mapid/" + id),
+    deletePartByMapUserId: (mapId, userId) =>
+      axios.delete(url + mapId + "/" + userId),
   };
 };
 

@@ -24,30 +24,48 @@ namespace QuizAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Question>>> GetQuestions()
         {
-          if (_context.Questions == null)
-          {
-              return NotFound();
-          }
-            return await _context.Questions.ToListAsync();
+            var questions = await _context.Questions.ToListAsync();
+
+            if (questions == null)
+            {
+                return NotFound();
+            }
+            var randomQuestions = questions.OrderBy(q => Guid.NewGuid()).Take(10).ToList();
+            return randomQuestions;
         }
-
-        // GET: api/Question/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Question>> GetQuestion(int id)
+        public async Task<ActionResult<IEnumerable<Question>>> GetQuestionsById(int id)
         {
-          if (_context.Questions == null)
-          {
-              return NotFound();
-          }
-            var question = await _context.Questions.FindAsync(id);
+            var questions = await _context.Questions.ToListAsync();
 
-            if (question == null)
+            var filteredQuestions = questions.Where(q => q.MapId == id).Take(10).ToList();
+
+            if (filteredQuestions.Count == 0)
             {
                 return NotFound();
             }
 
-            return question;
+            return filteredQuestions;
         }
+
+        [HttpGet("getbymap/{mapId}")]
+        public async Task<ActionResult<IEnumerable<Question>>> GetQuestionsByMapId(int mapId)
+        {
+            var filteredQuestions = await _context.Questions
+                .Where(q => q.MapId == mapId)
+                .ToListAsync();
+
+            if (filteredQuestions.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return filteredQuestions;
+        }
+
+
+
+        // GET: api/Question/5
 
         // PUT: api/Question/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -92,7 +110,7 @@ namespace QuizAPI.Controllers
             _context.Questions.Add(question);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetQuestion", new { id = question.Id }, question);
+            return CreatedAtAction(nameof(PostQuestion), new { id = question.Id }, question);
         }
 
         // DELETE: api/Question/5
@@ -114,6 +132,26 @@ namespace QuizAPI.Controllers
 
             return NoContent();
         }
+
+
+        [HttpDelete("deleteby-mapid/{mapId}")]
+        public async Task<IActionResult> DeleteQuestionsByMapId(int mapId)
+        {
+            var questions = await _context.Questions
+                .Where(q => q.MapId == mapId)
+                .ToListAsync();
+
+            if (questions == null || questions.Count == 0)
+            {
+                return NotFound();
+            }
+
+            _context.Questions.RemoveRange(questions);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
 
         private bool QuestionExists(int id)
         {

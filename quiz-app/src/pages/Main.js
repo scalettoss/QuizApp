@@ -21,16 +21,18 @@ import { ENDPOINTS } from "../API/api";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
 import EditIcon from "@mui/icons-material/Edit";
 import { CreateQuizModal } from "./CreateQuizModal";
+import { color, style } from "@mui/system";
 
 function Main() {
   const [user, setUser] = useState(null);
+  const [mapData, setMapData] = useState(null);
+  const [selectedMap, setSelectedMap] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       fetchUserInfo(token);
     }
   }, []);
-
   const fetchUserInfo = (token) => {
     const api = createAPIEndpoint(ENDPOINTS.user);
     api
@@ -44,13 +46,31 @@ function Main() {
         console.error(error);
       });
   };
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchMap = async () => {
+      try {
+        const mapAPI = createAPIEndpoint(ENDPOINTS.map);
+        const response = await mapAPI.getAvailableMap();
+        console.log("Response from map endpoint:", response.data);
+        setMapData(response.data);
+      } catch (error) {
+        console.error("Error fetching data from map endpoint:", error);
+      }
+    };
 
+    fetchMap();
+  }, []);
+
+  const navigate = useNavigate();
   const [cardGameModalOpen, setCardGameModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const handleCardGameModalOpen = () => {
+  const handleCardGameModalOpen = (mapId) => {
+    const selectedMap = mapData.find((map) => map.id === mapId);
+    setSelectedMap(selectedMap);
     setCardGameModalOpen(true);
+    console.log(selectedMap);
   };
+
   const handleCardGameModalClose = () => {
     setCardGameModalOpen(false);
   };
@@ -65,11 +85,11 @@ function Main() {
     setCreateModalOpen(false);
   };
 
-  const handleSinglePlayClick = () => {
+  const handleSinglePlayClick = (mapId) => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      navigate("/quiz");
+      navigate(`/quiz/${mapId}`); // Truyền mapId qua đường dẫn
     }, 2000);
   };
 
@@ -78,7 +98,7 @@ function Main() {
       const key = localStorage.key(i);
       localStorage.removeItem(key);
     }
-    navigate("/login");
+    navigate("/");
   };
 
   return (
@@ -112,7 +132,7 @@ function Main() {
                     </a>
                   </li>
                   <li className="active">
-                    <a href="/#">
+                    <a href="/main">
                       <HouseSimple size={20} />
                       <span className="text">Explore</span>
                     </a>
@@ -188,17 +208,21 @@ function Main() {
 
           <ArrowFatLinesDown style={{ color: "green", fontSize: "20px" }} />
           <div className="card-game-area">
-            <div className="card-game" onClick={handleCardGameModalOpen}>
-              <div className="card-game-img">
-                <img src="/assets/main_site/images/it.png" alt="Error"></img>
-              </div>
-              <div className="card-game-text">
-                <span>10 Question</span>
-                <p>Basic level of Programing Language</p>
-              </div>
-            </div>
+            {mapData &&
+              mapData.map((map) => (
+                <div
+                  className="card-game"
+                  onClick={() => handleCardGameModalOpen(map.id)}
+                >
+                  <div className="card-game-img">
+                    <img src="/assets/img/quiz.png" alt="Error"></img>
+                  </div>
+                  <div className="card-game-text">
+                    <p key={map.id}>{map.title}</p>
+                  </div>
+                </div>
+              ))}
           </div>
-
           {/* Modal */}
           <Modal
             open={cardGameModalOpen}
@@ -207,41 +231,59 @@ function Main() {
             aria-describedby="modal-modal-description"
           >
             <Box className="modal-box">
-              <Typography>
-                <div className="modal-title">
-                  <img src="/assets/main_site/images/it.png" alt="Error"></img>
-                  <span>10 Question</span>
-                  <p>Basic level of Programing Language</p>
-                </div>
-                <div className="modal-hr"></div>
-                <div className="modal-des">
-                  <p>
-                    Difficulty level: <span>EASY</span>
-                  </p>
-                  <h5>
-                    Kiến thức cơ bản về các ngôn ngữ trong lập trình (python,
-                    java, html, swift,...)Mỗi câu có 10 giây đếm ngược để trả
-                    lời
-                  </h5>
-                </div>
-                <div className="border-hr"></div>
-                <div className="modal-button">
-                  <button onClick={handleSinglePlayClick}>Single Play</button>
-                  <button>Host Play</button>
-                </div>
-                {isLoading && (
-                  <div className="spinner-container">
-                    <ThreeDots
-                      height="80"
-                      width="80"
-                      radius="9"
-                      color="#5b21b6"
-                      ariaLabel="three-dots-loading"
-                      visible={true}
-                    />
+              {selectedMap && (
+                <Typography>
+                  <div className="modal-title">
+                    <img src={selectedMap.img} alt="Error"></img>
+                    <span>Topic: {selectedMap.topic}</span>
+                    <p>{selectedMap.title}</p>
                   </div>
-                )}
-              </Typography>
+                  <div className="modal-hr"></div>
+                  <div className="modal-des">
+                    <p>
+                      Difficulty level:{" "}
+                      <span
+                        style={{
+                          color:
+                            selectedMap.difficulty == 0
+                              ? "#22c55e"
+                              : selectedMap.difficulty == 1
+                              ? "yellow"
+                              : "red",
+                        }}
+                      >
+                        {selectedMap.difficulty == 0
+                          ? "EASY"
+                          : selectedMap.difficulty == 1
+                          ? "MEDIUM"
+                          : "HARD"}
+                      </span>
+                    </p>
+                    <h5>{selectedMap.description}</h5>
+                  </div>
+                  <div className="border-hr"></div>
+                  <div className="modal-button">
+                    <button
+                      onClick={() => handleSinglePlayClick(selectedMap.id)}
+                    >
+                      Single Play
+                    </button>
+                    <button>Host Play</button>
+                  </div>
+                  {isLoading && (
+                    <div className="spinner-container">
+                      <ThreeDots
+                        height="80"
+                        width="80"
+                        radius="9"
+                        color="#5b21b6"
+                        ariaLabel="three-dots-loading"
+                        visible={true}
+                      />
+                    </div>
+                  )}
+                </Typography>
+              )}
             </Box>
           </Modal>
         </div>

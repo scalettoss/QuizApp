@@ -12,21 +12,25 @@ import QuizPage from "./pages/toast";
 import List from "./pages/List";
 import CreateQuizModal from "./pages/CreateQuizModal";
 import Complete from "./pages/CompleteQuiz";
+import EditQuiz from "./pages/EditQuiz";
+import EditCreate from "./pages/EditCreate";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
   <BrowserRouter>
     <Routes>
-      <Route path="/login" element={<SignIn />} />
+      <Route path="/" element={<SignIn />} />
       <Route path="/register" element={<SignUp />} />
-      <Route path="/" element={<Main />} />
-      <Route path="/quiz" element={<Quiz />} />
-      <Route path="/board" element={<Leader_boadrd />} />
+      <Route path="/main" element={<Main />} />
+      <Route path="/quiz/:mapId" element={<Quiz />} />
+      <Route path="/board/:mapId" element={<Leader_boadrd />} />
       <Route path="/test" element={<QuizPage />} />
       <Route path="/list" element={<List />} />
       <Route path="/create" element={<CreateQuizModal />} />
       <Route path="/complete" element={<Complete />} />
+      <Route path="/edit/:id" element={<EditQuiz />} />
+      <Route path="/editcreate/:id" element={<EditCreate />} />
     </Routes>
   </BrowserRouter>
   // </React.StrictMode>

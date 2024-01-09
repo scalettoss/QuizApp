@@ -58,7 +58,7 @@ function SignIn() {
         localStorage.setItem("token", response.data);
         toast_success();
         setTimeout(() => {
-          navigate("/");
+          navigate("/main");
         }, 2000);
       })
       .catch((error) => {
@@ -99,13 +99,10 @@ function SignIn() {
             </div>
             <div className="fxt-bg-color">
               <div className="fxt-header">
-                <Link to="/login" className="fxt-logo"></Link>
+                <Link to="/" className="fxt-logo"></Link>
                 <p>BAOQUIZ</p>
                 <div className="fxt-page-switcher">
-                  <Link
-                    to="/login"
-                    className="switcher-text switcher-text1 active"
-                  >
+                  <Link to="/" className="switcher-text switcher-text1 active">
                     Login
                   </Link>
                   <Link to="/register" className="switcher-text switcher-text2">
@@ -138,9 +135,9 @@ function SignIn() {
                       onChange={handlePasswordChange}
                     />
                     <i className="flaticon-padlock"></i>
-                    <Link to="/forgot" className="switcher-text3">
+                    {/* <Link to="/forgot" className="switcher-text3">
                       Forgot Password
-                    </Link>
+                    </Link> */}
                   </div>
                   <div className="form-group fxt-transformY-50 fxt-transition-delay-3">
                     <div className="fxt-content-between">

@@ -252,3 +252,4 @@ D:\VSXANH\Reactjs\Quiz-Project\QuizAPI\QuizAPI\bin\Debug\net7.0\ru\Microsoft.Cod
 D:\VSXANH\Reactjs\Quiz-Project\QuizAPI\QuizAPI\bin\Debug\net7.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\VSXANH\Reactjs\Quiz-Project\QuizAPI\QuizAPI\bin\Debug\net7.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\VSXANH\Reactjs\Quiz-Project\QuizAPI\QuizAPI\bin\Debug\net7.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\VSXANH\Reactjs\Quiz-Project\QuizAPI\QuizAPI\bin\Debug\net7.0\BCrypt.Net-Next.dll

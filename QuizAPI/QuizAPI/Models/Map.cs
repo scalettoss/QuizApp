@@ -3,40 +3,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuizAPI.Models
 {
-    public class Question
+    public class Map
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
         [Column(TypeName = "nvarchar(255)")]
         public string Title { get; set; }
-
         [Required]
         [Column(TypeName = "nvarchar(255)")]
-        public string OP1 { get; set; }
-
+        public string Description { get; set; }
         [Required]
         [Column(TypeName = "nvarchar(255)")]
-        public string OP2 { get; set; }
-
+        public string Difficulty { get; set; }
         [Required]
         [Column(TypeName = "nvarchar(255)")]
-        public string OP3 { get; set; }
-
-        [Required]
+        public string Topic { get; set; }
+        public int? Status { get; set; }
         [Column(TypeName = "nvarchar(255)")]
-        public string OP4 { get; set; }
-
-        [Required]
-        [Column(TypeName = "nvarchar(255)")]
-        public string Answer { get; set; }
-
-        [Required]
-        public DateTime CreateAt { get; set; }
-
+        public string? Img { get; set; }
         [Required]
         public int CreateBy { get; set; }
-        public int? MapId { get; set; }
     }
 }

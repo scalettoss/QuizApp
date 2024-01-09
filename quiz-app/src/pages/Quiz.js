@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useState, useEffect } from "react";
 import createAPIEndpoint from "../API/api";
 import { ENDPOINTS } from "../API/api";
 import { Link } from "react-router-dom";
@@ -13,9 +7,11 @@ import IncorrectSound from "../mp3/incorrect.mp3";
 import TimeRemain from "../mp3/timeremains.mp3";
 import { Alarm } from "@phosphor-icons/react";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function Quiz() {
   const navigate = useNavigate();
+  const { mapId } = useParams();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -26,11 +22,9 @@ function Quiz() {
   const [tempScore, setTempScore] = useState(0);
   const correctAudio = new Audio(CorrectSound);
   const incorrectAudio = new Audio(IncorrectSound);
-  const timeremain = new Audio(TimeRemain);
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        let fetchedQuestions = [];
         const storedQuestions = localStorage.getItem("quizQuestions");
         const storedScore = localStorage.getItem("quizScore");
         const storedCurrentQuestionIndex = localStorage.getItem(
@@ -44,27 +38,33 @@ function Quiz() {
           storedCurrentQuestionIndex &&
           storedTimeRemaining
         ) {
-          fetchedQuestions = JSON.parse(storedQuestions);
+          const fetchedQuestions = JSON.parse(storedQuestions);
           setScore(parseInt(storedScore));
           setCurrentQuestionIndex(parseInt(storedCurrentQuestionIndex));
           setTimeRemaining(parseInt(storedTimeRemaining));
+          setQuestions(fetchedQuestions);
         } else {
-          const response = await createAPIEndpoint(ENDPOINTS.question).fetch();
-          fetchedQuestions = response.data;
-          fetchedQuestions.forEach((question) => {
-            question.options = shuffleOptions(question.options);
-          });
+          const response = await createAPIEndpoint(
+            ENDPOINTS.question
+          ).fetchById(mapId);
+          const fetchedQuestions = response.data.map((question) => ({
+            ...question,
+            options: [question.oP1, question.oP2, question.oP3, question.oP4],
+          }));
+
           localStorage.setItem(
             "quizQuestions",
             JSON.stringify(fetchedQuestions)
           );
-
           localStorage.setItem("quizScore", "0");
           localStorage.setItem("quizCurrentQuestionIndex", "0");
           localStorage.setItem("quizTimeRemaining", "10");
-        }
 
-        setQuestions(fetchedQuestions);
+          setQuestions(fetchedQuestions);
+          setScore(0);
+          setCurrentQuestionIndex(0);
+          setTimeRemaining(10);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -87,7 +87,6 @@ function Quiz() {
   }, [timeRemaining]);
 
   useEffect(() => {
-    // Đếm ngược thời gian
     const timer = setInterval(() => {
       setTimeRemaining((prevTime) => prevTime - 1);
     }, 1000);
@@ -128,7 +127,6 @@ function Quiz() {
       const incorrectQuestionIndexes = storedIndexes
         ? JSON.parse(storedIndexes)
         : [];
-
       // Thêm vị trí và đáp án sai vào mảng incorrectQuestionIndexes
       incorrectQuestionIndexes.push({
         index: currentQuestionIndex,
@@ -155,10 +153,32 @@ function Quiz() {
         setShowResult(false);
         setIsCorrect(false);
       } else {
-        navigate("/board");
+        navigate(`/board/${mapId}`);
       }
     }, 1000);
   };
+
+  if (questions.length === 0) {
+    return (
+      <div
+        className="parent-container"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <div className="no-question">
+          <p>
+            NO QUESTION! <a href="/main">Back to home</a>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  const currentQuestion = questions[currentQuestionIndex];
+  const currentOptions = currentQuestion.options;
 
   const shuffleOptions = (options) => {
     const shuffledOptions = [...options];
@@ -174,7 +194,6 @@ function Quiz() {
 
   const handleLeaveClick = () => {
     const token = localStorage.getItem("token"); // Giữ lại mục "token"
-
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
       if (key !== "token" && key !== "user") {
@@ -187,13 +206,6 @@ function Quiz() {
     }
   };
 
-  if (questions.length === 0) {
-    return <p>Loading questions...</p>;
-  }
-
-  const currentQuestion = questions[currentQuestionIndex];
-
-  const currentOptions = currentQuestion.options;
   return (
     <div className="quiz-game">
       <div className="header-quiz-game">
@@ -211,7 +223,7 @@ function Quiz() {
           <span className="quiz-quest-icon">{questions.length} Question</span>
         </div>
         <div className="quiz-a">
-          <Link to="/" className="quiz-href" onClick={handleLeaveClick}>
+          <Link to="/main" className="quiz-href" onClick={handleLeaveClick}>
             LEAVE
           </Link>
         </div>
@@ -222,20 +234,20 @@ function Quiz() {
             <span className="quiz-question-title">{currentQuestion.title}</span>
           </div>
           <div className="quiz-submit-button">
-            {currentOptions.map((option, index) => (
+            {currentOptions.map((options, index) => (
               <button
                 key={index}
-                onClick={() => handleOptionClick(option)}
+                onClick={() => handleOptionClick(options)}
                 disabled={selectedAnswer !== "" || showResult}
                 className={
-                  selectedAnswer === option
+                  selectedAnswer === options
                     ? isCorrect
                       ? "selected correct"
                       : "selected incorrect"
                     : ""
                 }
               >
-                {option}
+                {options}
               </button>
             ))}
           </div>

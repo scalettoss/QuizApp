@@ -14,6 +14,7 @@ body {
   display: flex;
   /* align-items: center; */
   width: 100%; 
+
   min-height: 100vh;
 }
 .sidebar {
@@ -324,8 +325,6 @@ body {
   margin-right: 30px;
   display: flex;
   justify-content: space-between;
-
-  
 }
 
 
@@ -380,6 +379,9 @@ body {
 {
   margin-left: 30px;
   margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 
@@ -391,7 +393,9 @@ body {
 }
 .card-game-text p
 {
-  padding: 5px 0px 0px 10px;
+  text-align: center;
+  margin-top: 10px;
+  padding: 5px 0px 0px 15px;
   color: white;
   font-size: 15px;
   line-height: 20px;
@@ -416,12 +420,13 @@ body {
 .modal-box
 {
   width: 482px;
-  height: 580px;
+  height: auto;
   background-color: white;
   position: absolute;
   top: 14%;
   left: 34%;
   background-color: #1e1f38;
+  padding-bottom: 10px;
 
 }
 
@@ -551,5 +556,22 @@ body {
     width: 80%;
   }
 }
+.card-game {
+  /* Kiểu dáng mặc định */
+  transition: transform 0.3s ease;
+}
 
+.card-game:hover {
+  /* Kiểu dáng khi hover vào */
+  transform: translateY(-10px);
+}
+.card-game-new
+{
+  transition: transform 0.3s ease;
+
+}
+.card-game-new:hover {
+  /* Kiểu dáng khi hover vào */
+  transform: translateY(-10px);
+}
 
